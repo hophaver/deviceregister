@@ -21,23 +21,42 @@
 * SQLite database with direct SQL queries
 * Clean, minimalist black-and-white HTML + CSS
 
-## Installation
+## Installation and Running
 
-Install the `flask` library:
+1. **Clone the repository and enter the directory**:
 
-```
-$ pip install flask
-```
-
-Create the database tables and insert initial data:
-
-```
-$ sqlite3 database.db < schema.sql
-$ sqlite3 database.db < init.sql
+```bash
+git clone https://github.com/hophaver/deviceregister.git
+cd deviceregister
 ```
 
-Start the application:
+2. **Create and activate a virtual environment**:
 
+```bash
+python3 -m venv venv
+source venv/bin/activate
 ```
-$ flask run
+
+*(On Windows, activate with `venv\Scripts\activate`)*
+
+3. **Install the dependencies**:
+
+```bash
+pip install -r requirements.txt
 ```
+
+4. **Initialize the database**:
+
+```bash
+python3 init_db.py
+```
+
+5. **Start the application**:
+
+```bash
+flask run
+```
+
+6. **Open in browser**:
+
+Navigate to [http://127.0.0.1:5000](http://127.0.0.1:5000) in your web browser.

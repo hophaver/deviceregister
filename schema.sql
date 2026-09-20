@@ -1,0 +1,2 @@
+-- Initial database schema for Device Register
+-- Feature tables will be defined in subsequent feature steps.
