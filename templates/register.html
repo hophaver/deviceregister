@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Register - Device Register</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Device Register</h1>
+    <h2>Register</h2>
+
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+
+    <form action="/register" method="post">
+        <div>
+            <label for="username">Username</label><br>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <br>
+        <div>
+            <label for="password">Password</label><br>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <br>
+        <button type="submit">Register</button>
+    </form>
+
+    <p><a href="/">Back to home</a></p>
+</body>
+</html>
