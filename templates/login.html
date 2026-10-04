@@ -3,18 +3,18 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Register - Device Register</title>
+    <title>Log In - Device Register</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <h1>Device Register</h1>
-    <h2>Register</h2>
+    <h2>Log In</h2>
 
     {% if error %}
         <p style="color: red;">{{ error }}</p>
     {% endif %}
 
-    <form action="/register" method="post">
+    <form action="/login" method="post">
         <div>
             <label for="username">Username</label><br>
             <input type="text" id="username" name="username" required>
@@ -25,10 +25,10 @@
             <input type="password" id="password" name="password" required>
         </div>
         <br>
-        <button type="submit">Register</button>
+        <button type="submit">Log In</button>
     </form>
 
-    <p>Already have an account? <a href="/login">Log in</a></p>
+    <p>Don't have an account? <a href="/register">Register</a></p>
     <p><a href="/">Back to home</a></p>
 </body>
 </html>

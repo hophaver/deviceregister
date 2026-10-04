@@ -8,7 +8,18 @@
 </head>
 <body>
     <h1>Device Register</h1>
+
+    {% if session.get("username") %}
+        <p>Logged in as <strong>{{ session["username"] }}</strong></p>
+        <form action="/logout" method="post" style="display: inline;">
+            <button type="submit">Log out</button>
+        </form>
+    {% else %}
+        <p>
+            <a href="/login">Log in</a> | <a href="/register">Register</a>
+        </p>
+    {% endif %}
+
     <p>Welcome to Device Register.</p>
-    <p><a href="/register">Register</a></p>
 </body>
 </html>

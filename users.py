@@ -1,5 +1,5 @@
 import db
-from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 
 def register_user(username, password):
@@ -23,3 +23,21 @@ def register_user(username, password):
         (username, password_hash, is_admin),
     )
     return True, None
+
+
+def authenticate_user(username, password):
+    """Authenticate user with username and password. Returns user row if valid, None otherwise."""
+    if not username or not password:
+        return None
+
+    user = db.query_one(
+        "SELECT id, username, password_hash, is_admin FROM users WHERE username = ?",
+        (username,),
+    )
+    if not user:
+        return None
+
+    if not check_password_hash(user["password_hash"], password):
+        return None
+
+    return user
