@@ -21,5 +21,32 @@
     {% endif %}
 
     <p>Welcome to Device Register.</p>
+
+    <h2>Devices</h2>
+
+    {% if devices %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Model</th>
+                    <th>Serial Number</th>
+                    <th>Owner</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for device in devices %}
+                    <tr>
+                        <td>{{ device.name }}</td>
+                        <td>{{ device.model or "-" }}</td>
+                        <td>{{ device.serial_number or "-" }}</td>
+                        <td>{{ device.owner_username or "Unassigned" }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No devices registered yet.</p>
+    {% endif %}
 </body>
 </html>

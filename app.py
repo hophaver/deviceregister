@@ -2,6 +2,7 @@ import os
 from flask import Flask, render_template, request, redirect, session
 import db
 import users
+import devices
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -10,7 +11,8 @@ db.init_app(app)
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    all_devices = devices.get_all_devices()
+    return render_template("index.html", devices=all_devices)
 
 
 @app.route("/register", methods=["GET", "POST"])
