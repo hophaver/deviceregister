@@ -60,6 +60,31 @@ def logout():
     return redirect("/")
 
 
+@app.route("/devices/new", methods=["GET", "POST"])
+def new_device():
+    if "user_id" not in session:
+        return redirect("/login")
+
+    all_users = users.get_all_users()
+
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        model = request.form.get("model", "").strip() or None
+        serial_number = request.form.get("serial_number", "").strip() or None
+        description = request.form.get("description", "").strip() or None
+        owner_id_str = request.form.get("owner_id", "").strip()
+        owner_id = int(owner_id_str) if owner_id_str else None
+
+        if not name:
+            return render_template("new_device.html", users=all_users, error="Device name is required.")
+
+        creator_id = session["user_id"]
+        devices.create_device(name, model, serial_number, description, creator_id, owner_id)
+        return redirect("/")
+
+    return render_template("new_device.html", users=all_users)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
 

@@ -41,3 +41,9 @@ def authenticate_user(username, password):
         return None
 
     return user
+
+
+def get_all_users():
+    """Retrieve all registered users ordered alphabetically by username."""
+    return db.query("SELECT id, username FROM users ORDER BY username ASC")
+

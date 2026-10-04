@@ -11,6 +11,7 @@
 
     {% if session.get("username") %}
         <p>Logged in as <strong>{{ session["username"] }}</strong></p>
+        <p><a href="/devices/new">Add new device</a></p>
         <form action="/logout" method="post" style="display: inline;">
             <button type="submit">Log out</button>
         </form>

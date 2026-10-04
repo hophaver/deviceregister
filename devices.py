@@ -21,3 +21,16 @@ def get_all_devices():
         ORDER BY d.id DESC
     """
     return db.query(sql)
+
+
+def create_device(name, model, serial_number, description, creator_id, owner_id):
+    """Insert a new device into the database and return its id."""
+    cursor = db.execute(
+        """
+        INSERT INTO devices (name, model, serial_number, description, creator_id, owner_id)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """,
+        (name, model, serial_number, description, creator_id, owner_id),
+    )
+    return cursor.lastrowid
+

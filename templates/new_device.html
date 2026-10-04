@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Add New Device - Device Register</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Device Register</h1>
+    <h2>Add New Device</h2>
+
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+
+    <form action="/devices/new" method="post">
+        <div>
+            <label for="name">Device Name</label><br>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <br>
+        <div>
+            <label for="model">Model</label><br>
+            <input type="text" id="model" name="model">
+        </div>
+        <br>
+        <div>
+            <label for="serial_number">Serial Number</label><br>
+            <input type="text" id="serial_number" name="serial_number">
+        </div>
+        <br>
+        <div>
+            <label for="description">Description</label><br>
+            <textarea id="description" name="description" rows="4" cols="40"></textarea>
+        </div>
+        <br>
+        <div>
+            <label for="owner_id">Owner</label><br>
+            <select id="owner_id" name="owner_id">
+                <option value="">-- Unassigned --</option>
+                {% for user in users %}
+                    <option value="{{ user.id }}" {% if user.id == session.get("user_id") %}selected{% endif %}>
+                        {{ user.username }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <br>
+        <button type="submit">Add Device</button>
+    </form>
+
+    <p><a href="/">Back to devices</a></p>
+</body>
+</html>
