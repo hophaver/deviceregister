@@ -79,8 +79,9 @@ def new_device():
         owner_id_str = request.form.get("owner_id", "").strip()
         owner_id = int(owner_id_str) if owner_id_str else None
 
-        if not name:
-            return render_template("new_device.html", users=all_users, error="Device name is required.")
+        is_valid, error = devices.validate_device(name, model, serial_number, description)
+        if not is_valid:
+            return render_template("new_device.html", users=all_users, error=error)
 
         creator_id = session["user_id"]
         devices.create_device(name, model, serial_number, description, creator_id, owner_id)
@@ -122,12 +123,13 @@ def edit_device(device_id):
         owner_id_str = request.form.get("owner_id", "").strip()
         owner_id = int(owner_id_str) if owner_id_str else None
 
-        if not name:
+        is_valid, error = devices.validate_device(name, model, serial_number, description)
+        if not is_valid:
             return render_template(
                 "edit_device.html",
                 device=device,
                 users=all_users,
-                error="Device name is required.",
+                error=error,
             )
 
         devices.update_device(device_id, name, model, serial_number, description, owner_id)

@@ -2,10 +2,26 @@ import db
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
+def validate_registration(username, password):
+    """Validate registration parameters. Returns (is_valid, error_message)."""
+    if not username:
+        return False, "Username is required."
+    if len(username) < 3 or len(username) > 30:
+        return False, "Username must be between 3 and 30 characters."
+    if not password:
+        return False, "Password is required."
+    if len(password) < 4:
+        return False, "Password must be at least 4 characters long."
+    if len(password) > 100:
+        return False, "Password cannot exceed 100 characters."
+    return True, None
+
+
 def register_user(username, password):
     """Register a new user. The first registered user is automatically made admin."""
-    if not username or not password:
-        return False, "Username and password are required."
+    is_valid, error = validate_registration(username, password)
+    if not is_valid:
+        return False, error
 
     existing_user = db.query_one(
         "SELECT id FROM users WHERE username = ?",
@@ -23,6 +39,7 @@ def register_user(username, password):
         (username, password_hash, is_admin),
     )
     return True, None
+
 
 
 def authenticate_user(username, password):

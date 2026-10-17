@@ -51,6 +51,21 @@ def search_devices(query_str):
 
 
 
+def validate_device(name, model=None, serial_number=None, description=None):
+    """Validate device attributes. Returns (is_valid, error_message)."""
+    if not name or not name.strip():
+        return False, "Device name is required."
+    if len(name.strip()) > 100:
+        return False, "Device name cannot exceed 100 characters."
+    if model and len(model.strip()) > 100:
+        return False, "Model cannot exceed 100 characters."
+    if serial_number and len(serial_number.strip()) > 100:
+        return False, "Serial number cannot exceed 100 characters."
+    if description and len(description.strip()) > 2000:
+        return False, "Description cannot exceed 2000 characters."
+    return True, None
+
+
 def create_device(name, model, serial_number, description, creator_id, owner_id):
     """Insert a new device into the database and return its id."""
     cursor = db.execute(
