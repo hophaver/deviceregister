@@ -21,6 +21,7 @@
             {% endif %}
         </p>
         <form action="/logout" method="post" style="display: inline;">
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
             <button type="submit">Log out</button>
         </form>
     {% else %}

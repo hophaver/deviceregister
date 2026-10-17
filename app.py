@@ -1,4 +1,5 @@
 import os
+import secrets
 from flask import Flask, render_template, request, redirect, session, abort
 import db
 import users
@@ -9,6 +10,17 @@ import maintenance
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 db.init_app(app)
+
+
+@app.before_request
+def csrf_protect():
+    if "csrf_token" not in session:
+        session["csrf_token"] = secrets.token_hex(16)
+    if request.method == "POST":
+        token = request.form.get("csrf_token")
+        if not token or token != session.get("csrf_token"):
+            abort(403)
+
 
 
 @app.route("/")

@@ -35,6 +35,7 @@
                                 <span>All permissions (Admin)</span>
                             {% else %}
                                 <form action="/admin/users/{{ user.id }}/privileges" method="post" style="display: inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
                                     <label><input type="checkbox" name="can_add" value="1" {% if user.can_add %}checked{% endif %}> Add</label>
                                     <label><input type="checkbox" name="can_edit" value="1" {% if user.can_edit %}checked{% endif %}> Edit</label>
                                     <label><input type="checkbox" name="can_delete" value="1" {% if user.can_delete %}checked{% endif %}> Delete</label>
@@ -48,6 +49,7 @@
                                 <em>Current User</em>
                             {% else %}
                                 <form action="/admin/users/{{ user.id }}/delete" method="post" onsubmit="return confirm('Are you sure you want to delete this user?');" style="display: inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
                                     <button type="submit">Delete</button>
                                 </form>
                             {% endif %}
