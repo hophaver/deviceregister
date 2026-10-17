@@ -36,6 +36,46 @@
         </div>
         <br>
         <div>
+            <label for="type_id">Type</label><br>
+            <select id="type_id" name="type_id">
+                <option value="">-- Unspecified --</option>
+                {% for item in classifications.types %}
+                    <option value="{{ item.id }}" {% if item.id == device.type_id %}selected{% endif %}>{{ item.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <br>
+        <div>
+            <label for="category_id">Category</label><br>
+            <select id="category_id" name="category_id">
+                <option value="">-- Unspecified --</option>
+                {% for item in classifications.categories %}
+                    <option value="{{ item.id }}" {% if item.id == device.category_id %}selected{% endif %}>{{ item.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <br>
+        <div>
+            <label for="location_id">Location</label><br>
+            <select id="location_id" name="location_id">
+                <option value="">-- Unspecified --</option>
+                {% for item in classifications.locations %}
+                    <option value="{{ item.id }}" {% if item.id == device.location_id %}selected{% endif %}>{{ item.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <br>
+        <div>
+            <label for="os_id">Operating System</label><br>
+            <select id="os_id" name="os_id">
+                <option value="">-- Unspecified --</option>
+                {% for item in classifications.operating_systems %}
+                    <option value="{{ item.id }}" {% if item.id == device.os_id %}selected{% endif %}>{{ item.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <br>
+        <div>
             <label for="owner_id">Owner</label><br>
             <select id="owner_id" name="owner_id">
                 <option value="">-- Unassigned --</option>

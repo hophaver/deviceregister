@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, redirect, session, abort
 import db
 import users
 import devices
+import classifications
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -80,6 +81,7 @@ def new_device():
         abort(403)
 
     all_users = users.get_all_users()
+    all_classifications = classifications.get_all_classifications()
 
     if request.method == "POST":
         name = request.form.get("name", "").strip()
@@ -89,15 +91,32 @@ def new_device():
         owner_id_str = request.form.get("owner_id", "").strip()
         owner_id = int(owner_id_str) if owner_id_str else None
 
+        type_id_str = request.form.get("type_id", "").strip()
+        type_id = int(type_id_str) if type_id_str else None
+        category_id_str = request.form.get("category_id", "").strip()
+        category_id = int(category_id_str) if category_id_str else None
+        location_id_str = request.form.get("location_id", "").strip()
+        location_id = int(location_id_str) if location_id_str else None
+        os_id_str = request.form.get("os_id", "").strip()
+        os_id = int(os_id_str) if os_id_str else None
+
         is_valid, error = devices.validate_device(name, model, serial_number, description)
         if not is_valid:
-            return render_template("new_device.html", users=all_users, error=error)
+            return render_template(
+                "new_device.html",
+                users=all_users,
+                classifications=all_classifications,
+                error=error,
+            )
 
         creator_id = session["user_id"]
-        devices.create_device(name, model, serial_number, description, creator_id, owner_id)
+        devices.create_device(
+            name, model, serial_number, description, creator_id, owner_id,
+            type_id=type_id, category_id=category_id, location_id=location_id, os_id=os_id,
+        )
         return redirect("/")
 
-    return render_template("new_device.html", users=all_users)
+    return render_template("new_device.html", users=all_users, classifications=all_classifications)
 
 
 @app.route("/devices/<int:device_id>")
@@ -134,6 +153,7 @@ def edit_device(device_id):
         abort(403)
 
     all_users = users.get_all_users()
+    all_classifications = classifications.get_all_classifications()
 
     if request.method == "POST":
         name = request.form.get("name", "").strip()
@@ -143,19 +163,33 @@ def edit_device(device_id):
         owner_id_str = request.form.get("owner_id", "").strip()
         owner_id = int(owner_id_str) if owner_id_str else None
 
+        type_id_str = request.form.get("type_id", "").strip()
+        type_id = int(type_id_str) if type_id_str else None
+        category_id_str = request.form.get("category_id", "").strip()
+        category_id = int(category_id_str) if category_id_str else None
+        location_id_str = request.form.get("location_id", "").strip()
+        location_id = int(location_id_str) if location_id_str else None
+        os_id_str = request.form.get("os_id", "").strip()
+        os_id = int(os_id_str) if os_id_str else None
+
         is_valid, error = devices.validate_device(name, model, serial_number, description)
         if not is_valid:
             return render_template(
                 "edit_device.html",
                 device=device,
                 users=all_users,
+                classifications=all_classifications,
                 error=error,
             )
 
-        devices.update_device(device_id, name, model, serial_number, description, owner_id)
+        devices.update_device(
+            device_id, name, model, serial_number, description, owner_id,
+            type_id=type_id, category_id=category_id, location_id=location_id, os_id=os_id,
+        )
         return redirect(f"/devices/{device_id}")
 
-    return render_template("edit_device.html", device=device, users=all_users)
+    return render_template("edit_device.html", device=device, users=all_users, classifications=all_classifications)
+
 
 
 @app.route("/devices/<int:device_id>/delete", methods=["POST"])

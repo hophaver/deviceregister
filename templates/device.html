@@ -25,6 +25,10 @@
 
     <p><strong>Model:</strong> {{ device.model or "-" }}</p>
     <p><strong>Serial Number:</strong> {{ device.serial_number or "-" }}</p>
+    <p><strong>Type:</strong> {{ device.type_name or "-" }}</p>
+    <p><strong>Category:</strong> {{ device.category_name or "-" }}</p>
+    <p><strong>Location:</strong> {{ device.location_name or "-" }}</p>
+    <p><strong>Operating System:</strong> {{ device.os_name or "-" }}</p>
     <p><strong>Description:</strong></p>
     <p style="white-space: pre-wrap;">{{ device.description or "-" }}</p>
     <p><strong>Assigned Owner:</strong> {{ device.owner_username or "Unassigned" }}</p>
