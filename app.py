@@ -248,6 +248,33 @@ def delete_device(device_id):
     return redirect("/")
 
 
+@app.route("/devices/<int:device_id>/maintenance", methods=["POST"])
+def add_maintenance_log(device_id):
+    if "user_id" not in session:
+        return redirect("/login")
+
+    device = devices.get_device_by_id(device_id)
+    if not device:
+        abort(404)
+
+    service_date = request.form.get("service_date", "").strip()
+    description = request.form.get("description", "").strip()
+    cost_str = request.form.get("cost", "").strip()
+
+    try:
+        cost = float(cost_str) if cost_str else 0.0
+        if cost < 0:
+            cost = 0.0
+    except ValueError:
+        cost = 0.0
+
+    if service_date and description:
+        maintenance.add_maintenance_log(device_id, session["user_id"], service_date, description, cost)
+
+    return redirect(f"/devices/{device_id}")
+
+
+
 @app.route("/admin/users")
 def admin_users():
     if "user_id" not in session or not session.get("is_admin"):

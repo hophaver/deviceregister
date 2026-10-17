@@ -72,6 +72,28 @@
         <p>No maintenance logs recorded for this device yet.</p>
     {% endif %}
 
+    {% if session.get("username") %}
+        <h4>Add Maintenance Log</h4>
+        <form action="/devices/{{ device.id }}/maintenance" method="post">
+            <div>
+                <label for="service_date">Service Date</label><br>
+                <input type="date" id="service_date" name="service_date" required>
+            </div>
+            <br>
+            <div>
+                <label for="cost">Cost (€)</label><br>
+                <input type="number" id="cost" name="cost" step="0.01" min="0" placeholder="0.00">
+            </div>
+            <br>
+            <div>
+                <label for="log_description">Work Description</label><br>
+                <textarea id="log_description" name="description" rows="3" cols="40" required></textarea>
+            </div>
+            <br>
+            <button type="submit">Add Log</button>
+        </form>
+    {% endif %}
+
     <p><a href="/">Back to devices</a></p>
 </body>
 </html>

@@ -19,3 +19,16 @@ def get_logs_for_device(device_id):
         ORDER BY m.service_date DESC, m.id DESC
     """
     return db.query(sql, (device_id,))
+
+
+def add_maintenance_log(device_id, user_id, service_date, description, cost=0.0):
+    """Insert a new maintenance log record."""
+    cursor = db.execute(
+        """
+        INSERT INTO maintenance_logs (device_id, user_id, service_date, description, cost)
+        VALUES (?, ?, ?, ?, ?)
+        """,
+        (device_id, user_id, service_date, description, cost),
+    )
+    return cursor.lastrowid
+
