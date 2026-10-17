@@ -38,7 +38,7 @@
             <tbody>
                 {% for device in devices %}
                     <tr>
-                        <td>{{ device.name }}</td>
+                        <td><a href="/devices/{{ device.id }}">{{ device.name }}</a></td>
                         <td>{{ device.model or "-" }}</td>
                         <td>{{ device.serial_number or "-" }}</td>
                         <td>{{ device.owner_username or "Unassigned" }}</td>

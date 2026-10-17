@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, abort
 import db
 import users
 import devices
@@ -83,6 +83,14 @@ def new_device():
         return redirect("/")
 
     return render_template("new_device.html", users=all_users)
+
+
+@app.route("/devices/<int:device_id>")
+def device_details(device_id):
+    device = devices.get_device_by_id(device_id)
+    if not device:
+        abort(404)
+    return render_template("device.html", device=device)
 
 
 if __name__ == "__main__":

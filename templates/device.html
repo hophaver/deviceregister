@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ device.name }} - Device Register</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Device Register</h1>
+
+    {% if session.get("username") %}
+        <p>Logged in as <strong>{{ session["username"] }}</strong></p>
+        <p><a href="/devices/new">Add new device</a></p>
+        <form action="/logout" method="post" style="display: inline;">
+            <button type="submit">Log out</button>
+        </form>
+    {% else %}
+        <p>
+            <a href="/login">Log in</a> | <a href="/register">Register</a>
+        </p>
+    {% endif %}
+
+    <h2>{{ device.name }}</h2>
+
+    <p><strong>Model:</strong> {{ device.model or "-" }}</p>
+    <p><strong>Serial Number:</strong> {{ device.serial_number or "-" }}</p>
+    <p><strong>Description:</strong></p>
+    <p style="white-space: pre-wrap;">{{ device.description or "-" }}</p>
+    <p><strong>Assigned Owner:</strong> {{ device.owner_username or "Unassigned" }}</p>
+    <p><strong>Created by:</strong> {{ device.creator_username }}</p>
+    <p><strong>Added on:</strong> {{ device.created_at }}</p>
+
+    <p><a href="/">Back to devices</a></p>
+</body>
+</html>
