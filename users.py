@@ -136,5 +136,28 @@ def get_devices_by_user(user_id):
     return db.query(sql, (user_id, user_id))
 
 
+def get_user_statistics(user_id):
+    """Retrieve statistical counters for user inventory activity."""
+    owned_row = db.query_one(
+        "SELECT COUNT(id) AS count FROM devices WHERE owner_id = ?",
+        (user_id,),
+    )
+    created_row = db.query_one(
+        "SELECT COUNT(id) AS count FROM devices WHERE creator_id = ?",
+        (user_id,),
+    )
+    logs_row = db.query_one(
+        "SELECT COUNT(id) AS count, COALESCE(SUM(cost), 0.0) AS total_cost FROM maintenance_logs WHERE user_id = ?",
+        (user_id,),
+    )
+    return {
+        "devices_owned": owned_row["count"] if owned_row else 0,
+        "devices_created": created_row["count"] if created_row else 0,
+        "maintenance_logs_count": logs_row["count"] if logs_row else 0,
+        "total_maintenance_cost": logs_row["total_cost"] if logs_row else 0.0,
+    }
+
+
+
 
 

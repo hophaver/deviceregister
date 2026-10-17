@@ -28,6 +28,13 @@
     <p><strong>Role:</strong> {{ "Administrator" if user.is_admin else "Regular User" }}</p>
     <p><strong>Member since:</strong> {{ user.created_at }}</p>
 
+    <h3>Activity & Statistics</h3>
+    <ul>
+        <li><strong>Devices Owned:</strong> {{ stats.devices_owned }}</li>
+        <li><strong>Devices Added:</strong> {{ stats.devices_created }}</li>
+        <li><strong>Maintenance Logs Recorded:</strong> {{ stats.maintenance_logs_count }} (Total: {{ "%.2f"|format(stats.total_maintenance_cost) }} €)</li>
+    </ul>
+
     <h3>Associated Devices</h3>
     {% if user_devices %}
         <table>

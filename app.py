@@ -310,7 +310,9 @@ def user_profile(user_id):
     if not user:
         abort(404)
     user_devices = users.get_devices_by_user(user_id)
-    return render_template("user_profile.html", user=user, user_devices=user_devices)
+    stats = users.get_user_statistics(user_id)
+    return render_template("user_profile.html", user=user, user_devices=user_devices, stats=stats)
+
 
 
 if __name__ == "__main__":
