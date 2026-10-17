@@ -1,5 +1,8 @@
-import db
+"""User management and authentication service layer."""
+
 from werkzeug.security import check_password_hash, generate_password_hash
+import db
+import devices
 
 
 def validate_registration(username, password):
@@ -38,7 +41,11 @@ def register_user(username, password):
     password_hash = generate_password_hash(password)
 
     db.execute(
-        "INSERT INTO users (username, password_hash, is_admin, can_add, can_edit, can_delete) VALUES (?, ?, ?, ?, ?, ?)",
+        """
+        INSERT INTO users (
+            username, password_hash, is_admin, can_add, can_edit, can_delete
+        ) VALUES (?, ?, ?, ?, ?, ?)
+        """,
         (username, password_hash, is_admin, can_add, can_edit, can_delete),
     )
     return True, None
@@ -50,7 +57,10 @@ def authenticate_user(username, password):
         return None
 
     user = db.query_one(
-        "SELECT id, username, password_hash, is_admin, can_add, can_edit, can_delete FROM users WHERE username = ?",
+        """
+        SELECT id, username, password_hash, is_admin, can_add, can_edit, can_delete
+        FROM users WHERE username = ?
+        """,
         (username,),
     )
     if not user:
@@ -90,7 +100,10 @@ def update_user_privileges(user_id, can_add, can_edit, can_delete):
 def get_all_users():
     """Retrieve all registered users with details and privileges."""
     return db.query(
-        "SELECT id, username, is_admin, can_add, can_edit, can_delete, created_at FROM users ORDER BY username ASC"
+        """
+        SELECT id, username, is_admin, can_add, can_edit, can_delete, created_at
+        FROM users ORDER BY username ASC
+        """
     )
 
 
@@ -115,25 +128,7 @@ def get_user_by_id(user_id):
 
 def get_devices_by_user(user_id):
     """Retrieve all devices owned or created by a user."""
-    sql = """
-        SELECT
-            d.id,
-            d.name,
-            d.model,
-            d.serial_number,
-            d.description,
-            d.creator_id,
-            d.owner_id,
-            d.created_at,
-            t.name AS type_name,
-            loc.name AS location_name
-        FROM devices d
-        LEFT JOIN device_types t ON d.type_id = t.id
-        LEFT JOIN locations loc ON d.location_id = loc.id
-        WHERE d.owner_id = ? OR d.creator_id = ?
-        ORDER BY d.id DESC
-    """
-    return db.query(sql, (user_id, user_id))
+    return devices.get_devices_by_user(user_id)
 
 
 def get_user_statistics(user_id):
@@ -147,7 +142,10 @@ def get_user_statistics(user_id):
         (user_id,),
     )
     logs_row = db.query_one(
-        "SELECT COUNT(id) AS count, COALESCE(SUM(cost), 0.0) AS total_cost FROM maintenance_logs WHERE user_id = ?",
+        """
+        SELECT COUNT(id) AS count, COALESCE(SUM(cost), 0.0) AS total_cost
+        FROM maintenance_logs WHERE user_id = ?
+        """,
         (user_id,),
     )
     return {
@@ -156,8 +154,3 @@ def get_user_statistics(user_id):
         "maintenance_logs_count": logs_row["count"] if logs_row else 0,
         "total_maintenance_cost": logs_row["total_cost"] if logs_row else 0.0,
     }
-
-
-
-
-

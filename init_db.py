@@ -1,3 +1,5 @@
+"""Database schema initialization and seed script for default classifications."""
+
 import sqlite3
 
 DATABASE = "database.db"
@@ -40,6 +42,7 @@ DEFAULT_OPERATING_SYSTEMS = [
 
 
 def init_db():
+    """Create database tables from schema.sql and populate default classifications."""
     conn = sqlite3.connect(DATABASE)
     conn.execute("PRAGMA foreign_keys = ON")
     with open("schema.sql", "r", encoding="utf-8") as f:

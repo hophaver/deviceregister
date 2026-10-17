@@ -1,3 +1,5 @@
+"""Maintenance log service layer handling device service history and submissions."""
+
 import db
 
 
@@ -31,4 +33,3 @@ def add_maintenance_log(device_id, user_id, service_date, description, cost=0.0)
         (device_id, user_id, service_date, description, cost),
     )
     return cursor.lastrowid
-

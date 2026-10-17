@@ -1,3 +1,5 @@
+"""Device data service layer handling CRUD operations, searching, and filtering."""
+
 import db
 
 
@@ -50,7 +52,9 @@ def search_devices(query_str):
     return db.query(sql, (pattern, pattern, pattern, pattern))
 
 
-def count_filtered_devices(keyword=None, type_id=None, category_id=None, location_id=None, os_id=None):
+def count_filtered_devices(
+    keyword=None, type_id=None, category_id=None, location_id=None, os_id=None
+):
     """Count total devices matching optional keyword and classification filters."""
     sql = "SELECT COUNT(d.id) AS count FROM devices d WHERE 1=1"
     params = []
@@ -85,8 +89,17 @@ def count_filtered_devices(keyword=None, type_id=None, category_id=None, locatio
     return row["count"] if row else 0
 
 
-def get_filtered_devices(keyword=None, type_id=None, category_id=None, location_id=None, os_id=None, limit=None, offset=None):
-    """Retrieve devices matching optional keyword and classification filters with optional pagination."""
+# pylint: disable=too-many-arguments,too-many-positional-arguments
+def get_filtered_devices(
+    keyword=None,
+    type_id=None,
+    category_id=None,
+    location_id=None,
+    os_id=None,
+    limit=None,
+    offset=None,
+):
+    """Retrieve devices matching optional keyword and classification filters with pagination."""
     sql = DEVICE_SELECT_SQL + " WHERE 1=1"
     params = []
 
@@ -128,8 +141,6 @@ def get_filtered_devices(keyword=None, type_id=None, category_id=None, location_
     return db.query(sql, params)
 
 
-
-
 def validate_device(name, model=None, serial_number=None, description=None):
     """Validate device attributes. Returns (is_valid, error_message)."""
     if not name or not name.strip():
@@ -145,8 +156,19 @@ def validate_device(name, model=None, serial_number=None, description=None):
     return True, None
 
 
-def create_device(name, model, serial_number, description, creator_id, owner_id,
-                  type_id=None, category_id=None, location_id=None, os_id=None):
+# pylint: disable=too-many-arguments,too-many-positional-arguments
+def create_device(
+    name,
+    model,
+    serial_number,
+    description,
+    creator_id,
+    owner_id,
+    type_id=None,
+    category_id=None,
+    location_id=None,
+    os_id=None,
+):
     """Insert a new device into the database and return its id."""
     cursor = db.execute(
         """
@@ -157,9 +179,18 @@ def create_device(name, model, serial_number, description, creator_id, owner_id,
         )
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
-        (name, model, serial_number, description,
-         type_id, category_id, location_id, os_id,
-         creator_id, owner_id),
+        (
+            name,
+            model,
+            serial_number,
+            description,
+            type_id,
+            category_id,
+            location_id,
+            os_id,
+            creator_id,
+            owner_id,
+        ),
     )
     return cursor.lastrowid
 
@@ -170,8 +201,28 @@ def get_device_by_id(device_id):
     return db.query_one(sql, (device_id,))
 
 
-def update_device(device_id, name, model, serial_number, description, owner_id,
-                  type_id=None, category_id=None, location_id=None, os_id=None):
+def get_devices_by_user(user_id):
+    """Retrieve all devices owned or created by a user."""
+    sql = (
+        DEVICE_SELECT_SQL
+        + " WHERE d.owner_id = ? OR d.creator_id = ? ORDER BY d.id DESC"
+    )
+    return db.query(sql, (user_id, user_id))
+
+
+# pylint: disable=too-many-arguments,too-many-positional-arguments
+def update_device(
+    device_id,
+    name,
+    model,
+    serial_number,
+    description,
+    owner_id,
+    type_id=None,
+    category_id=None,
+    location_id=None,
+    os_id=None,
+):
     """Update details of an existing device."""
     db.execute(
         """
@@ -180,8 +231,18 @@ def update_device(device_id, name, model, serial_number, description, owner_id,
             type_id = ?, category_id = ?, location_id = ?, os_id = ?
         WHERE id = ?
         """,
-        (name, model, serial_number, description, owner_id,
-         type_id, category_id, location_id, os_id, device_id),
+        (
+            name,
+            model,
+            serial_number,
+            description,
+            owner_id,
+            type_id,
+            category_id,
+            location_id,
+            os_id,
+            device_id,
+        ),
     )
 
 

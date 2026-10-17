@@ -1,3 +1,5 @@
+"""Database helper functions for SQLite connection management and queries."""
+
 import sqlite3
 from flask import g
 
@@ -13,7 +15,7 @@ def get_db():
     return g.db
 
 
-def close_db(e=None):
+def close_db(_e=None):
     """Close database connection on request teardown."""
     db = g.pop("db", None)
     if db is not None:

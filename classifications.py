@@ -1,3 +1,5 @@
+"""Device classification queries for categories, types, locations, and operating systems."""
+
 import db
 
 

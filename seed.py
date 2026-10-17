@@ -63,15 +63,8 @@ SAMPLE_LOG_DESCRIPTIONS = [
 ]
 
 
-def seed_database():
-    start_time = time.time()
-    print("Reinitializing database schema and default classifications...")
-    init_db.init_db()
-
-    conn = sqlite3.connect(DATABASE)
-    conn.execute("PRAGMA foreign_keys = ON")
-
-    # 1. Seed users
+def _seed_users(conn):
+    """Seed test users into the database and return their IDs."""
     print("Seeding users...")
     password_hash = generate_password_hash("password123")
     user_data = [
@@ -94,32 +87,30 @@ def seed_database():
         user_data,
     )
     conn.commit()
+    return [row[0] for row in conn.execute("SELECT id FROM users").fetchall()]
 
-    user_ids = [row[0] for row in conn.execute("SELECT id FROM users").fetchall()]
+
+def _seed_devices(conn, user_ids):
+    """Generate and insert bulk mock devices and return their IDs."""
+    print(f"Generating and inserting {DEVICE_COUNT:,} devices...")
     type_ids = [row[0] for row in conn.execute("SELECT id FROM device_types").fetchall()]
     category_ids = [row[0] for row in conn.execute("SELECT id FROM categories").fetchall()]
     location_ids = [row[0] for row in conn.execute("SELECT id FROM locations").fetchall()]
     os_ids = [row[0] for row in conn.execute("SELECT id FROM operating_systems").fetchall()]
 
-    # 2. Seed 10,000+ devices in batch
-    print(f"Generating and inserting {DEVICE_COUNT:,} devices...")
     device_rows = []
     for i in range(1, DEVICE_COUNT + 1):
-        name = random.choice(SAMPLE_DEVICE_NAMES)
-        model = random.choice(SAMPLE_MODELS)
-        serial_number = f"SN-{random.randint(100000, 999999)}-{i:05d}"
-        description = f"Inventory unit #{i:05d}. Standard corporate issue asset."
-        type_id = random.choice(type_ids)
-        category_id = random.choice(category_ids)
-        location_id = random.choice(location_ids)
-        os_id = random.choice(os_ids)
-        creator_id = random.choice(user_ids)
-        owner_id = random.choice(user_ids) if random.random() > 0.1 else None
-
         device_rows.append((
-            name, model, serial_number, description,
-            type_id, category_id, location_id, os_id,
-            creator_id, owner_id
+            random.choice(SAMPLE_DEVICE_NAMES),
+            random.choice(SAMPLE_MODELS),
+            f"SN-{random.randint(100000, 999999)}-{i:05d}",
+            f"Inventory unit #{i:05d}. Standard corporate issue asset.",
+            random.choice(type_ids),
+            random.choice(category_ids),
+            random.choice(location_ids),
+            random.choice(os_ids),
+            random.choice(user_ids),
+            random.choice(user_ids) if random.random() > 0.1 else None,
         ))
 
     conn.executemany(
@@ -134,10 +125,12 @@ def seed_database():
         device_rows,
     )
     conn.commit()
-
     device_ids = [row[0] for row in conn.execute("SELECT id FROM devices").fetchall()]
+    return device_ids, len(device_rows)
 
-    # 3. Seed maintenance logs in batch
+
+def _seed_maintenance_logs(conn, device_ids, user_ids):
+    """Generate and insert bulk maintenance records."""
     print(f"Generating and inserting {LOG_COUNT:,} maintenance logs...")
     log_rows = []
     for _ in range(LOG_COUNT):
@@ -156,6 +149,22 @@ def seed_database():
         log_rows,
     )
     conn.commit()
+    return len(log_rows)
+
+
+def seed_database():
+    """Populate database with users, devices, and maintenance logs for testing."""
+    start_time = time.time()
+    print("Reinitializing database schema and default classifications...")
+    init_db.init_db()
+
+    conn = sqlite3.connect(DATABASE)
+    conn.execute("PRAGMA foreign_keys = ON")
+
+    user_ids = _seed_users(conn)
+    device_ids, device_count = _seed_devices(conn, user_ids)
+    log_count = _seed_maintenance_logs(conn, device_ids, user_ids)
+
     conn.close()
 
     elapsed = time.time() - start_time
@@ -163,8 +172,8 @@ def seed_database():
     print("Seeding completed successfully!")
     print(f"Total time elapsed: {elapsed:.2f} seconds")
     print(f"Users created:      {len(user_ids)}")
-    print(f"Devices created:    {len(device_rows):,}")
-    print(f"Maintenance logs:   {len(log_rows):,}")
+    print(f"Devices created:    {device_count:,}")
+    print(f"Maintenance logs:   {log_count:,}")
     print("=" * 50)
 
 
