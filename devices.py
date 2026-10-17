@@ -50,8 +50,43 @@ def search_devices(query_str):
     return db.query(sql, (pattern, pattern, pattern, pattern))
 
 
-def get_filtered_devices(keyword=None, type_id=None, category_id=None, location_id=None, os_id=None):
-    """Retrieve devices matching optional keyword and classification filters."""
+def count_filtered_devices(keyword=None, type_id=None, category_id=None, location_id=None, os_id=None):
+    """Count total devices matching optional keyword and classification filters."""
+    sql = "SELECT COUNT(d.id) AS count FROM devices d WHERE 1=1"
+    params = []
+
+    if keyword:
+        sql += """ AND (
+            d.name LIKE ?
+            OR d.model LIKE ?
+            OR d.serial_number LIKE ?
+            OR d.description LIKE ?
+        )"""
+        pattern = f"%{keyword}%"
+        params.extend([pattern, pattern, pattern, pattern])
+
+    if type_id:
+        sql += " AND d.type_id = ?"
+        params.append(type_id)
+
+    if category_id:
+        sql += " AND d.category_id = ?"
+        params.append(category_id)
+
+    if location_id:
+        sql += " AND d.location_id = ?"
+        params.append(location_id)
+
+    if os_id:
+        sql += " AND d.os_id = ?"
+        params.append(os_id)
+
+    row = db.query_one(sql, params)
+    return row["count"] if row else 0
+
+
+def get_filtered_devices(keyword=None, type_id=None, category_id=None, location_id=None, os_id=None, limit=None, offset=None):
+    """Retrieve devices matching optional keyword and classification filters with optional pagination."""
     sql = DEVICE_SELECT_SQL + " WHERE 1=1"
     params = []
 
@@ -82,7 +117,16 @@ def get_filtered_devices(keyword=None, type_id=None, category_id=None, location_
         params.append(os_id)
 
     sql += " ORDER BY d.id DESC"
+
+    if limit is not None:
+        sql += " LIMIT ?"
+        params.append(limit)
+        if offset is not None:
+            sql += " OFFSET ?"
+            params.append(offset)
+
     return db.query(sql, params)
+
 
 
 

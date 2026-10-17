@@ -110,6 +110,21 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        {% if total_pages > 1 %}
+            <div class="pagination">
+                <p>Page {{ page }} of {{ total_pages }} ({{ total_devices }} devices total)</p>
+                <p>
+                    {% if page > 1 %}
+                        <a href="/?page={{ page - 1 }}&query={{ query }}&type_id={{ type_id or '' }}&category_id={{ category_id or '' }}&location_id={{ location_id or '' }}&os_id={{ os_id or '' }}">Previous</a>
+                    {% endif %}
+                    {% if page > 1 and page < total_pages %} | {% endif %}
+                    {% if page < total_pages %}
+                        <a href="/?page={{ page + 1 }}&query={{ query }}&type_id={{ type_id or '' }}&category_id={{ category_id or '' }}&location_id={{ location_id or '' }}&os_id={{ os_id or '' }}">Next</a>
+                    {% endif %}
+                </p>
+            </div>
+        {% endif %}
     {% else %}
         <p>No devices found.</p>
     {% endif %}

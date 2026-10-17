@@ -23,6 +23,9 @@ def csrf_protect():
 
 
 
+PAGE_SIZE = 10
+
+
 @app.route("/")
 def index():
     query = request.args.get("query", "").strip()
@@ -35,12 +38,33 @@ def index():
     os_id_str = request.args.get("os_id", "").strip()
     os_id = int(os_id_str) if os_id_str else None
 
+    page_str = request.args.get("page", "1").strip()
+    try:
+        page = max(1, int(page_str))
+    except ValueError:
+        page = 1
+
+    total_devices = devices.count_filtered_devices(
+        keyword=query,
+        type_id=type_id,
+        category_id=category_id,
+        location_id=location_id,
+        os_id=os_id,
+    )
+    total_pages = max(1, (total_devices + PAGE_SIZE - 1) // PAGE_SIZE)
+    if page > total_pages:
+        page = total_pages
+
+    offset = (page - 1) * PAGE_SIZE
+
     all_devices = devices.get_filtered_devices(
         keyword=query,
         type_id=type_id,
         category_id=category_id,
         location_id=location_id,
         os_id=os_id,
+        limit=PAGE_SIZE,
+        offset=offset,
     )
 
     all_classifications = classifications.get_all_classifications()
@@ -59,7 +83,11 @@ def index():
         os_id=os_id,
         classifications=all_classifications,
         can_add=can_add,
+        page=page,
+        total_pages=total_pages,
+        total_devices=total_devices,
     )
+
 
 
 
