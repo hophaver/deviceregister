@@ -32,7 +32,12 @@
     <p><strong>Added on:</strong> {{ device.created_at }}</p>
 
     {% if session.get("is_admin") or session.get("user_id") == device.creator_id or session.get("user_id") == device.owner_id %}
-        <p><a href="/devices/{{ device.id }}/edit">Edit device</a></p>
+        <p>
+            <a href="/devices/{{ device.id }}/edit">Edit device</a>
+        </p>
+        <form action="/devices/{{ device.id }}/delete" method="post" onsubmit="return confirm('Are you sure you want to delete this device?');">
+            <button type="submit">Delete device</button>
+        </form>
     {% endif %}
 
     <p><a href="/">Back to devices</a></p>

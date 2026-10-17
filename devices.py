@@ -69,4 +69,10 @@ def update_device(device_id, name, model, serial_number, description, owner_id):
     )
 
 
+def delete_device(device_id):
+    """Delete a device by its ID."""
+    db.execute("DELETE FROM devices WHERE id = ?", (device_id,))
+
+
+
 

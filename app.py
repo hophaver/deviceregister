@@ -132,6 +132,25 @@ def edit_device(device_id):
     return render_template("edit_device.html", device=device, users=all_users)
 
 
+@app.route("/devices/<int:device_id>/delete", methods=["POST"])
+def delete_device(device_id):
+    if "user_id" not in session:
+        return redirect("/login")
+
+    device = devices.get_device_by_id(device_id)
+    if not device:
+        abort(404)
+
+    user_id = session["user_id"]
+    is_admin = session.get("is_admin", False)
+
+    if not is_admin and user_id != device["creator_id"] and user_id != device["owner_id"]:
+        abort(403)
+
+    devices.delete_device(device_id)
+    return redirect("/")
+
+
 if __name__ == "__main__":
     app.run(debug=True)
 
