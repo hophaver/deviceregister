@@ -31,6 +31,10 @@
     <p><strong>Created by:</strong> {{ device.creator_username }}</p>
     <p><strong>Added on:</strong> {{ device.created_at }}</p>
 
+    {% if session.get("is_admin") or session.get("user_id") == device.creator_id or session.get("user_id") == device.owner_id %}
+        <p><a href="/devices/{{ device.id }}/edit">Edit device</a></p>
+    {% endif %}
+
     <p><a href="/">Back to devices</a></p>
 </body>
 </html>

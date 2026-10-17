@@ -57,3 +57,16 @@ def get_device_by_id(device_id):
     return db.query_one(sql, (device_id,))
 
 
+def update_device(device_id, name, model, serial_number, description, owner_id):
+    """Update details of an existing device."""
+    db.execute(
+        """
+        UPDATE devices
+        SET name = ?, model = ?, serial_number = ?, description = ?, owner_id = ?
+        WHERE id = ?
+        """,
+        (name, model, serial_number, description, owner_id, device_id),
+    )
+
+
+

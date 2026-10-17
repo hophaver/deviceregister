@@ -93,6 +93,45 @@ def device_details(device_id):
     return render_template("device.html", device=device)
 
 
+@app.route("/devices/<int:device_id>/edit", methods=["GET", "POST"])
+def edit_device(device_id):
+    if "user_id" not in session:
+        return redirect("/login")
+
+    device = devices.get_device_by_id(device_id)
+    if not device:
+        abort(404)
+
+    user_id = session["user_id"]
+    is_admin = session.get("is_admin", False)
+
+    if not is_admin and user_id != device["creator_id"] and user_id != device["owner_id"]:
+        abort(403)
+
+    all_users = users.get_all_users()
+
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        model = request.form.get("model", "").strip() or None
+        serial_number = request.form.get("serial_number", "").strip() or None
+        description = request.form.get("description", "").strip() or None
+        owner_id_str = request.form.get("owner_id", "").strip()
+        owner_id = int(owner_id_str) if owner_id_str else None
+
+        if not name:
+            return render_template(
+                "edit_device.html",
+                device=device,
+                users=all_users,
+                error="Device name is required.",
+            )
+
+        devices.update_device(device_id, name, model, serial_number, description, owner_id)
+        return redirect(f"/devices/{device_id}")
+
+    return render_template("edit_device.html", device=device, users=all_users)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
 
