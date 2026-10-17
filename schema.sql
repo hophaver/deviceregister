@@ -1,5 +1,6 @@
 -- Database schema for Device Register
 
+DROP TABLE IF EXISTS maintenance_logs;
 DROP TABLE IF EXISTS devices;
 DROP TABLE IF EXISTS device_types;
 DROP TABLE IF EXISTS categories;
@@ -50,5 +51,15 @@ CREATE TABLE devices (
     os_id INTEGER REFERENCES operating_systems(id),
     creator_id INTEGER NOT NULL REFERENCES users(id),
     owner_id INTEGER REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE maintenance_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    device_id INTEGER NOT NULL REFERENCES devices(id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    service_date DATE NOT NULL,
+    description TEXT NOT NULL,
+    cost REAL DEFAULT 0.0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

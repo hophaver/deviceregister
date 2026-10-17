@@ -46,6 +46,32 @@
         </form>
     {% endif %}
 
+    <h3>Maintenance History</h3>
+    {% if maintenance_logs %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Technician</th>
+                    <th>Cost</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in maintenance_logs %}
+                    <tr>
+                        <td>{{ log.service_date }}</td>
+                        <td>{{ log.technician_username }}</td>
+                        <td>{{ "%.2f"|format(log.cost or 0) }} €</td>
+                        <td style="white-space: pre-wrap;">{{ log.description }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No maintenance logs recorded for this device yet.</p>
+    {% endif %}
+
     <p><a href="/">Back to devices</a></p>
 </body>
 </html>

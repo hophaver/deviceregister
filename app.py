@@ -4,6 +4,7 @@ import db
 import users
 import devices
 import classifications
+import maintenance
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -156,7 +157,15 @@ def device_details(device_id):
     can_edit = bool(privileges and (privileges["is_admin"] or (is_owner_or_creator and privileges["can_edit"])))
     can_delete = bool(privileges and (privileges["is_admin"] or (is_owner_or_creator and privileges["can_delete"])))
 
-    return render_template("device.html", device=device, can_edit=can_edit, can_delete=can_delete)
+    device_logs = maintenance.get_logs_for_device(device_id)
+
+    return render_template(
+        "device.html",
+        device=device,
+        can_edit=can_edit,
+        can_delete=can_delete,
+        maintenance_logs=device_logs,
+    )
 
 
 @app.route("/devices/<int:device_id>/edit", methods=["GET", "POST"])
