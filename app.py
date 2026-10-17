@@ -304,6 +304,14 @@ def delete_user(user_id):
     return redirect("/admin/users")
 
 
+@app.route("/users/<int:user_id>")
+def user_profile(user_id):
+    user = users.get_user_by_id(user_id)
+    if not user:
+        abort(404)
+    user_devices = users.get_devices_by_user(user_id)
+    return render_template("user_profile.html", user=user, user_devices=user_devices)
+
 
 if __name__ == "__main__":
     app.run(debug=True)

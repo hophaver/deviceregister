@@ -101,4 +101,40 @@ def delete_user(user_id):
     db.execute("DELETE FROM users WHERE id = ?", (user_id,))
 
 
+def get_user_by_id(user_id):
+    """Retrieve user details by ID."""
+    return db.query_one(
+        """
+        SELECT id, username, is_admin, created_at
+        FROM users
+        WHERE id = ?
+        """,
+        (user_id,),
+    )
+
+
+def get_devices_by_user(user_id):
+    """Retrieve all devices owned or created by a user."""
+    sql = """
+        SELECT
+            d.id,
+            d.name,
+            d.model,
+            d.serial_number,
+            d.description,
+            d.creator_id,
+            d.owner_id,
+            d.created_at,
+            t.name AS type_name,
+            loc.name AS location_name
+        FROM devices d
+        LEFT JOIN device_types t ON d.type_id = t.id
+        LEFT JOIN locations loc ON d.location_id = loc.id
+        WHERE d.owner_id = ? OR d.creator_id = ?
+        ORDER BY d.id DESC
+    """
+    return db.query(sql, (user_id, user_id))
+
+
+
 

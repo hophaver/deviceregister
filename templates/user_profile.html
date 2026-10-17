@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ user.username }} - User Profile - Device Register</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Device Register</h1>
+
+    {% if session.get("username") %}
+        <p>Logged in as <strong>{{ session["username"] }}</strong></p>
+        <p>
+            <a href="/">All Devices</a>
+            {% if session.get("user_id") == user.id %}
+                | <strong>My Profile</strong>
+            {% else %}
+                | <a href="/users/{{ session['user_id'] }}">My Profile</a>
+            {% endif %}
+        </p>
+    {% else %}
+        <p><a href="/login">Log in</a> | <a href="/register">Register</a></p>
+    {% endif %}
+
+    <h2>User Profile: {{ user.username }}</h2>
+
+    <p><strong>Role:</strong> {{ "Administrator" if user.is_admin else "Regular User" }}</p>
+    <p><strong>Member since:</strong> {{ user.created_at }}</p>
+
+    <h3>Associated Devices</h3>
+    {% if user_devices %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Model</th>
+                    <th>Location</th>
+                    <th>Relationship</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dev in user_devices %}
+                    <tr>
+                        <td><a href="/devices/{{ dev.id }}">{{ dev.name }}</a></td>
+                        <td>{{ dev.type_name or "-" }}</td>
+                        <td>{{ dev.model or "-" }}</td>
+                        <td>{{ dev.location_name or "-" }}</td>
+                        <td>
+                            {% if dev.owner_id == user.id and dev.creator_id == user.id %}
+                                Owner & Creator
+                            {% elif dev.owner_id == user.id %}
+                                Assigned Owner
+                            {% else %}
+                                Creator
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No devices associated with this user.</p>
+    {% endif %}
+
+    <p><a href="/">Back to devices</a></p>
+</body>
+</html>

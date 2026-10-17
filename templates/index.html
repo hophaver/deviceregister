@@ -12,11 +12,12 @@
     {% if session.get("username") %}
         <p>Logged in as <strong>{{ session["username"] }}</strong></p>
         <p>
+            <a href="/users/{{ session['user_id'] }}">My profile</a>
             {% if can_add %}
-                <a href="/devices/new">Add new device</a>
+                | <a href="/devices/new">Add new device</a>
             {% endif %}
             {% if session.get("is_admin") %}
-                {% if can_add %} | {% endif %}<a href="/admin/users">Manage users</a>
+                | <a href="/admin/users">Manage users</a>
             {% endif %}
         </p>
         <form action="/logout" method="post" style="display: inline;">
@@ -97,7 +98,13 @@
                         <td>{{ device.type_name or "-" }}</td>
                         <td>{{ device.model or "-" }}</td>
                         <td>{{ device.location_name or "-" }}</td>
-                        <td>{{ device.owner_username or "Unassigned" }}</td>
+                        <td>
+                            {% if device.owner_id %}
+                                <a href="/users/{{ device.owner_id }}">{{ device.owner_username }}</a>
+                            {% else %}
+                                Unassigned
+                            {% endif %}
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>

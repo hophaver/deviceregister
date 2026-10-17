@@ -31,8 +31,8 @@
     <p><strong>Operating System:</strong> {{ device.os_name or "-" }}</p>
     <p><strong>Description:</strong></p>
     <p style="white-space: pre-wrap;">{{ device.description or "-" }}</p>
-    <p><strong>Assigned Owner:</strong> {{ device.owner_username or "Unassigned" }}</p>
-    <p><strong>Created by:</strong> {{ device.creator_username }}</p>
+    <p><strong>Assigned Owner:</strong> {% if device.owner_id %}<a href="/users/{{ device.owner_id }}">{{ device.owner_username }}</a>{% else %}Unassigned{% endif %}</p>
+    <p><strong>Created by:</strong> <a href="/users/{{ device.creator_id }}">{{ device.creator_username }}</a></p>
     <p><strong>Added on:</strong> {{ device.created_at }}</p>
 
     {% if can_edit %}
@@ -61,7 +61,7 @@
                 {% for log in maintenance_logs %}
                     <tr>
                         <td>{{ log.service_date }}</td>
-                        <td>{{ log.technician_username }}</td>
+                        <td><a href="/users/{{ log.user_id }}">{{ log.technician_username }}</a></td>
                         <td>{{ "%.2f"|format(log.cost or 0) }} €</td>
                         <td style="white-space: pre-wrap;">{{ log.description }}</td>
                     </tr>
