@@ -23,6 +23,34 @@ def get_all_devices():
     return db.query(sql)
 
 
+def search_devices(query_str):
+    """Search devices by keyword across names, models, serial numbers, and descriptions."""
+    sql = """
+        SELECT
+            d.id,
+            d.name,
+            d.model,
+            d.serial_number,
+            d.description,
+            d.creator_id,
+            d.owner_id,
+            d.created_at,
+            c.username AS creator_username,
+            o.username AS owner_username
+        FROM devices d
+        JOIN users c ON d.creator_id = c.id
+        LEFT JOIN users o ON d.owner_id = o.id
+        WHERE d.name LIKE ?
+           OR d.model LIKE ?
+           OR d.serial_number LIKE ?
+           OR d.description LIKE ?
+        ORDER BY d.id DESC
+    """
+    pattern = f"%{query_str}%"
+    return db.query(sql, (pattern, pattern, pattern, pattern))
+
+
+
 def create_device(name, model, serial_number, description, creator_id, owner_id):
     """Insert a new device into the database and return its id."""
     cursor = db.execute(

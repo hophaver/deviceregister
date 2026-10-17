@@ -11,8 +11,12 @@ db.init_app(app)
 
 @app.route("/")
 def index():
-    all_devices = devices.get_all_devices()
-    return render_template("index.html", devices=all_devices)
+    query = request.args.get("query", "").strip()
+    if query:
+        all_devices = devices.search_devices(query)
+    else:
+        all_devices = devices.get_all_devices()
+    return render_template("index.html", devices=all_devices, query=query)
 
 
 @app.route("/register", methods=["GET", "POST"])

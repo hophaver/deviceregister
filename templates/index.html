@@ -25,6 +25,16 @@
 
     <h2>Devices</h2>
 
+    <form action="/" method="get">
+        <label for="query">Search devices:</label>
+        <input type="text" id="query" name="query" value="{{ query or '' }}" placeholder="Search name, model, serial, description...">
+        <button type="submit">Search</button>
+        {% if query %}
+            <a href="/">Clear</a>
+        {% endif %}
+    </form>
+    <br>
+
     {% if devices %}
         <table>
             <thead>
