@@ -12,9 +12,11 @@
     {% if session.get("username") %}
         <p>Logged in as <strong>{{ session["username"] }}</strong></p>
         <p>
-            <a href="/devices/new">Add new device</a>
+            {% if can_add %}
+                <a href="/devices/new">Add new device</a>
+            {% endif %}
             {% if session.get("is_admin") %}
-                | <a href="/admin/users">Manage users</a>
+                {% if can_add %} | {% endif %}<a href="/admin/users">Manage users</a>
             {% endif %}
         </p>
         <form action="/logout" method="post" style="display: inline;">

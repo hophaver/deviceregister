@@ -8,6 +8,9 @@ CREATE TABLE users (
     username TEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
     is_admin INTEGER NOT NULL DEFAULT 0,
+    can_add INTEGER NOT NULL DEFAULT 1,
+    can_edit INTEGER NOT NULL DEFAULT 1,
+    can_delete INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

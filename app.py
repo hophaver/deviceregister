@@ -16,7 +16,13 @@ def index():
         all_devices = devices.search_devices(query)
     else:
         all_devices = devices.get_all_devices()
-    return render_template("index.html", devices=all_devices, query=query)
+
+    user_id = session.get("user_id")
+    privileges = users.get_user_privileges(user_id) if user_id else None
+    can_add = bool(privileges and privileges["can_add"])
+
+    return render_template("index.html", devices=all_devices, query=query, can_add=can_add)
+
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -69,6 +75,10 @@ def new_device():
     if "user_id" not in session:
         return redirect("/login")
 
+    privileges = users.get_user_privileges(session["user_id"])
+    if not privileges or not privileges["can_add"]:
+        abort(403)
+
     all_users = users.get_all_users()
 
     if request.method == "POST":
@@ -95,7 +105,14 @@ def device_details(device_id):
     device = devices.get_device_by_id(device_id)
     if not device:
         abort(404)
-    return render_template("device.html", device=device)
+
+    user_id = session.get("user_id")
+    privileges = users.get_user_privileges(user_id) if user_id else None
+    is_owner_or_creator = bool(user_id and (user_id == device["creator_id"] or user_id == device["owner_id"]))
+    can_edit = bool(privileges and (privileges["is_admin"] or (is_owner_or_creator and privileges["can_edit"])))
+    can_delete = bool(privileges and (privileges["is_admin"] or (is_owner_or_creator and privileges["can_delete"])))
+
+    return render_template("device.html", device=device, can_edit=can_edit, can_delete=can_delete)
 
 
 @app.route("/devices/<int:device_id>/edit", methods=["GET", "POST"])
@@ -108,9 +125,12 @@ def edit_device(device_id):
         abort(404)
 
     user_id = session["user_id"]
-    is_admin = session.get("is_admin", False)
+    privileges = users.get_user_privileges(user_id)
+    if not privileges:
+        abort(403)
 
-    if not is_admin and user_id != device["creator_id"] and user_id != device["owner_id"]:
+    is_owner_or_creator = user_id == device["creator_id"] or user_id == device["owner_id"]
+    if not privileges["is_admin"] and not (is_owner_or_creator and privileges["can_edit"]):
         abort(403)
 
     all_users = users.get_all_users()
@@ -148,9 +168,12 @@ def delete_device(device_id):
         abort(404)
 
     user_id = session["user_id"]
-    is_admin = session.get("is_admin", False)
+    privileges = users.get_user_privileges(user_id)
+    if not privileges:
+        abort(403)
 
-    if not is_admin and user_id != device["creator_id"] and user_id != device["owner_id"]:
+    is_owner_or_creator = user_id == device["creator_id"] or user_id == device["owner_id"]
+    if not privileges["is_admin"] and not (is_owner_or_creator and privileges["can_delete"]):
         abort(403)
 
     devices.delete_device(device_id)
@@ -165,6 +188,17 @@ def admin_users():
     return render_template("admin_users.html", users=all_users)
 
 
+@app.route("/admin/users/<int:user_id>/privileges", methods=["POST"])
+def update_user_privileges(user_id):
+    if "user_id" not in session or not session.get("is_admin"):
+        abort(403)
+    can_add = 1 if request.form.get("can_add") else 0
+    can_edit = 1 if request.form.get("can_edit") else 0
+    can_delete = 1 if request.form.get("can_delete") else 0
+    users.update_user_privileges(user_id, can_add, can_edit, can_delete)
+    return redirect("/admin/users")
+
+
 @app.route("/admin/users/<int:user_id>/delete", methods=["POST"])
 def delete_user(user_id):
     if "user_id" not in session or not session.get("is_admin"):
@@ -173,6 +207,7 @@ def delete_user(user_id):
         return redirect("/admin/users")
     users.delete_user(user_id)
     return redirect("/admin/users")
+
 
 
 if __name__ == "__main__":

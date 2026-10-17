@@ -32,14 +32,16 @@ def register_user(username, password):
 
     count_row = db.query_one("SELECT COUNT(id) AS count FROM users")
     is_admin = 1 if count_row["count"] == 0 else 0
+    can_add = 1
+    can_edit = 1
+    can_delete = 1 if is_admin else 0
     password_hash = generate_password_hash(password)
 
     db.execute(
-        "INSERT INTO users (username, password_hash, is_admin) VALUES (?, ?, ?)",
-        (username, password_hash, is_admin),
+        "INSERT INTO users (username, password_hash, is_admin, can_add, can_edit, can_delete) VALUES (?, ?, ?, ?, ?, ?)",
+        (username, password_hash, is_admin, can_add, can_edit, can_delete),
     )
     return True, None
-
 
 
 def authenticate_user(username, password):
@@ -48,7 +50,7 @@ def authenticate_user(username, password):
         return None
 
     user = db.query_one(
-        "SELECT id, username, password_hash, is_admin FROM users WHERE username = ?",
+        "SELECT id, username, password_hash, is_admin, can_add, can_edit, can_delete FROM users WHERE username = ?",
         (username,),
     )
     if not user:
@@ -60,9 +62,36 @@ def authenticate_user(username, password):
     return user
 
 
+def get_user_privileges(user_id):
+    """Retrieve user privileges. Admins automatically have all permissions."""
+    row = db.query_one(
+        "SELECT is_admin, can_add, can_edit, can_delete FROM users WHERE id = ?",
+        (user_id,),
+    )
+    if not row:
+        return None
+    is_admin = bool(row["is_admin"])
+    return {
+        "is_admin": is_admin,
+        "can_add": is_admin or bool(row["can_add"]),
+        "can_edit": is_admin or bool(row["can_edit"]),
+        "can_delete": is_admin or bool(row["can_delete"]),
+    }
+
+
+def update_user_privileges(user_id, can_add, can_edit, can_delete):
+    """Update privilege flags for a given user."""
+    db.execute(
+        "UPDATE users SET can_add = ?, can_edit = ?, can_delete = ? WHERE id = ?",
+        (int(bool(can_add)), int(bool(can_edit)), int(bool(can_delete)), user_id),
+    )
+
+
 def get_all_users():
-    """Retrieve all registered users with details."""
-    return db.query("SELECT id, username, is_admin, created_at FROM users ORDER BY username ASC")
+    """Retrieve all registered users with details and privileges."""
+    return db.query(
+        "SELECT id, username, is_admin, can_add, can_edit, can_delete, created_at FROM users ORDER BY username ASC"
+    )
 
 
 def delete_user(user_id):
@@ -70,5 +99,6 @@ def delete_user(user_id):
     db.execute("UPDATE devices SET owner_id = NULL WHERE owner_id = ?", (user_id,))
     db.execute("DELETE FROM devices WHERE creator_id = ?", (user_id,))
     db.execute("DELETE FROM users WHERE id = ?", (user_id,))
+
 
 

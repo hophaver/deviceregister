@@ -20,6 +20,7 @@
                 <tr>
                     <th>Username</th>
                     <th>Role</th>
+                    <th>Privileges</th>
                     <th>Registered At</th>
                     <th>Action</th>
                 </tr>
@@ -29,6 +30,18 @@
                     <tr>
                         <td>{{ user.username }}</td>
                         <td>{{ "Admin" if user.is_admin else "User" }}</td>
+                        <td>
+                            {% if user.is_admin %}
+                                <span>All permissions (Admin)</span>
+                            {% else %}
+                                <form action="/admin/users/{{ user.id }}/privileges" method="post" style="display: inline;">
+                                    <label><input type="checkbox" name="can_add" value="1" {% if user.can_add %}checked{% endif %}> Add</label>
+                                    <label><input type="checkbox" name="can_edit" value="1" {% if user.can_edit %}checked{% endif %}> Edit</label>
+                                    <label><input type="checkbox" name="can_delete" value="1" {% if user.can_delete %}checked{% endif %}> Delete</label>
+                                    <button type="submit">Save</button>
+                                </form>
+                            {% endif %}
+                        </td>
                         <td>{{ user.created_at }}</td>
                         <td>
                             {% if user.id == session.get("user_id") %}
