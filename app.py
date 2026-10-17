@@ -157,6 +157,24 @@ def delete_device(device_id):
     return redirect("/")
 
 
+@app.route("/admin/users")
+def admin_users():
+    if "user_id" not in session or not session.get("is_admin"):
+        abort(403)
+    all_users = users.get_all_users()
+    return render_template("admin_users.html", users=all_users)
+
+
+@app.route("/admin/users/<int:user_id>/delete", methods=["POST"])
+def delete_user(user_id):
+    if "user_id" not in session or not session.get("is_admin"):
+        abort(403)
+    if user_id == session["user_id"]:
+        return redirect("/admin/users")
+    users.delete_user(user_id)
+    return redirect("/admin/users")
+
+
 if __name__ == "__main__":
     app.run(debug=True)
 

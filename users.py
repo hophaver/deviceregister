@@ -61,6 +61,14 @@ def authenticate_user(username, password):
 
 
 def get_all_users():
-    """Retrieve all registered users ordered alphabetically by username."""
-    return db.query("SELECT id, username FROM users ORDER BY username ASC")
+    """Retrieve all registered users with details."""
+    return db.query("SELECT id, username, is_admin, created_at FROM users ORDER BY username ASC")
+
+
+def delete_user(user_id):
+    """Delete a user account and clean up their device references."""
+    db.execute("UPDATE devices SET owner_id = NULL WHERE owner_id = ?", (user_id,))
+    db.execute("DELETE FROM devices WHERE creator_id = ?", (user_id,))
+    db.execute("DELETE FROM users WHERE id = ?", (user_id,))
+
 
