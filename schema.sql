@@ -63,3 +63,10 @@ CREATE TABLE maintenance_logs (
     cost REAL DEFAULT 0.0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX idx_devices_owner ON devices(owner_id);
+CREATE INDEX idx_devices_creator ON devices(creator_id);
+CREATE INDEX idx_devices_name ON devices(name);
+CREATE INDEX idx_maintenance_device ON maintenance_logs(device_id);
+CREATE INDEX idx_maintenance_user ON maintenance_logs(user_id);
+
