@@ -50,6 +50,42 @@ def search_devices(query_str):
     return db.query(sql, (pattern, pattern, pattern, pattern))
 
 
+def get_filtered_devices(keyword=None, type_id=None, category_id=None, location_id=None, os_id=None):
+    """Retrieve devices matching optional keyword and classification filters."""
+    sql = DEVICE_SELECT_SQL + " WHERE 1=1"
+    params = []
+
+    if keyword:
+        sql += """ AND (
+            d.name LIKE ?
+            OR d.model LIKE ?
+            OR d.serial_number LIKE ?
+            OR d.description LIKE ?
+        )"""
+        pattern = f"%{keyword}%"
+        params.extend([pattern, pattern, pattern, pattern])
+
+    if type_id:
+        sql += " AND d.type_id = ?"
+        params.append(type_id)
+
+    if category_id:
+        sql += " AND d.category_id = ?"
+        params.append(category_id)
+
+    if location_id:
+        sql += " AND d.location_id = ?"
+        params.append(location_id)
+
+    if os_id:
+        sql += " AND d.os_id = ?"
+        params.append(os_id)
+
+    sql += " ORDER BY d.id DESC"
+    return db.query(sql, params)
+
+
+
 def validate_device(name, model=None, serial_number=None, description=None):
     """Validate device attributes. Returns (is_valid, error_message)."""
     if not name or not name.strip():

@@ -13,16 +13,41 @@ db.init_app(app)
 @app.route("/")
 def index():
     query = request.args.get("query", "").strip()
-    if query:
-        all_devices = devices.search_devices(query)
-    else:
-        all_devices = devices.get_all_devices()
+    type_id_str = request.args.get("type_id", "").strip()
+    type_id = int(type_id_str) if type_id_str else None
+    category_id_str = request.args.get("category_id", "").strip()
+    category_id = int(category_id_str) if category_id_str else None
+    location_id_str = request.args.get("location_id", "").strip()
+    location_id = int(location_id_str) if location_id_str else None
+    os_id_str = request.args.get("os_id", "").strip()
+    os_id = int(os_id_str) if os_id_str else None
+
+    all_devices = devices.get_filtered_devices(
+        keyword=query,
+        type_id=type_id,
+        category_id=category_id,
+        location_id=location_id,
+        os_id=os_id,
+    )
+
+    all_classifications = classifications.get_all_classifications()
 
     user_id = session.get("user_id")
     privileges = users.get_user_privileges(user_id) if user_id else None
     can_add = bool(privileges and privileges["can_add"])
 
-    return render_template("index.html", devices=all_devices, query=query, can_add=can_add)
+    return render_template(
+        "index.html",
+        devices=all_devices,
+        query=query,
+        type_id=type_id,
+        category_id=category_id,
+        location_id=location_id,
+        os_id=os_id,
+        classifications=all_classifications,
+        can_add=can_add,
+    )
+
 
 
 

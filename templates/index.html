@@ -33,12 +33,49 @@
     <h2>Devices</h2>
 
     <form action="/" method="get">
-        <label for="query">Search devices:</label>
-        <input type="text" id="query" name="query" value="{{ query or '' }}" placeholder="Search name, model, serial, description...">
-        <button type="submit">Search</button>
-        {% if query %}
-            <a href="/">Clear</a>
-        {% endif %}
+        <div>
+            <label for="query">Keyword:</label>
+            <input type="text" id="query" name="query" value="{{ query or '' }}" placeholder="Search name, model, serial...">
+        </div>
+        <br>
+        <div>
+            <label for="type_id">Type:</label>
+            <select id="type_id" name="type_id">
+                <option value="">All Types</option>
+                {% for t in classifications.types %}
+                    <option value="{{ t.id }}" {% if type_id == t.id %}selected{% endif %}>{{ t.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="category_id">Category:</label>
+            <select id="category_id" name="category_id">
+                <option value="">All Categories</option>
+                {% for c in classifications.categories %}
+                    <option value="{{ c.id }}" {% if category_id == c.id %}selected{% endif %}>{{ c.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="location_id">Location:</label>
+            <select id="location_id" name="location_id">
+                <option value="">All Locations</option>
+                {% for l in classifications.locations %}
+                    <option value="{{ l.id }}" {% if location_id == l.id %}selected{% endif %}>{{ l.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="os_id">OS:</label>
+            <select id="os_id" name="os_id">
+                <option value="">All Operating Systems</option>
+                {% for o in classifications.operating_systems %}
+                    <option value="{{ o.id }}" {% if os_id == o.id %}selected{% endif %}>{{ o.name }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit">Filter</button>
+            {% if query or type_id or category_id or location_id or os_id %}
+                <a href="/">Reset</a>
+            {% endif %}
+        </div>
     </form>
     <br>
 
@@ -47,8 +84,9 @@
             <thead>
                 <tr>
                     <th>Name</th>
+                    <th>Type</th>
                     <th>Model</th>
-                    <th>Serial Number</th>
+                    <th>Location</th>
                     <th>Owner</th>
                 </tr>
             </thead>
@@ -56,15 +94,16 @@
                 {% for device in devices %}
                     <tr>
                         <td><a href="/devices/{{ device.id }}">{{ device.name }}</a></td>
+                        <td>{{ device.type_name or "-" }}</td>
                         <td>{{ device.model or "-" }}</td>
-                        <td>{{ device.serial_number or "-" }}</td>
+                        <td>{{ device.location_name or "-" }}</td>
                         <td>{{ device.owner_username or "Unassigned" }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     {% else %}
-        <p>No devices registered yet.</p>
+        <p>No devices found.</p>
     {% endif %}
 </body>
 </html>
